@@ -53,10 +53,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const loginDemo = useCallback(() => {
     // Demo user without API call
     const demoUser: User = {
-      id: 1,
+      id: 'demo-1',
       email: 'demo@chapitos.com',
       name: 'Usuario Demo',
       role: 'admin',
+      active: true,
+      created_at: new Date().toISOString(),
     }
     setStoredUser(demoUser)
     setUser(demoUser)
