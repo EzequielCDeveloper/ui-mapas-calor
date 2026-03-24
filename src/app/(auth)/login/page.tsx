@@ -12,15 +12,15 @@ import { useAuth } from '@/context/AuthContext'
 import { extractError } from '@/lib/api'
 
 const schema = z.object({
-  email: z.string().email('Email inválido'),
-  password: z.string().min(1, 'Contraseña requerida'),
+  email: z.string().email('Email inválido').optional().or(z.literal('')),
+  password: z.string().optional(),
   remember: z.boolean().optional(),
 })
 
 type FormData = z.infer<typeof schema>
 
 export default function LoginPage() {
-  const { login, isAuthenticated, isLoading: authLoading } = useAuth()
+  const { login, loginDemo, isAuthenticated, isLoading: authLoading } = useAuth()
   const router = useRouter()
   const [showPassword, setShowPassword] = useState(false)
   const [loginError, setLoginError] = useState<string | null>(null)
@@ -46,6 +46,10 @@ export default function LoginPage() {
   }, [isAuthenticated, authLoading, router])
 
   const onSubmit = async (data: FormData) => {
+    if (!data.email || !data.password) {
+      setLoginError('Por favor ingresa email y contraseña')
+      return
+    }
     setLoginError(null)
     setIsSubmitting(true)
     try {
@@ -92,11 +96,28 @@ export default function LoginPage() {
             </div>
           )}
 
+          <Button
+            onClick={loginDemo}
+            isLoading={isSubmitting}
+            className="w-full h-11 text-base mb-4"
+            size="lg"
+          >
+            Entrar como demo
+          </Button>
+
+          <div className="relative my-6">
+            <div className="absolute inset-0 flex items-center">
+              <div className="w-full border-t border-border"></div>
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-black-700 px-2 text-text-muted">O</span>
+            </div>
+          </div>
+
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <Input
               label="Email"
               type="email"
-              required
               placeholder="tu@correo.com"
               autoComplete="email"
               error={errors.email?.message}
@@ -108,7 +129,6 @@ export default function LoginPage() {
               <Input
                 label="Contraseña"
                 type={showPassword ? 'text' : 'password'}
-                required
                 placeholder="••••••••"
                 autoComplete="current-password"
                 error={errors.password?.message}
@@ -145,8 +165,9 @@ export default function LoginPage() {
               isLoading={isSubmitting}
               className="w-full h-11 text-base"
               size="lg"
+              variant="outline"
             >
-              Entrar como demo
+              Iniciar sesión
             </Button>
           </form>
         </div>

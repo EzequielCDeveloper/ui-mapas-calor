@@ -11,6 +11,7 @@ interface AuthContextValue {
   isLoading: boolean
   isAuthenticated: boolean
   login: (email: string, password: string) => Promise<void>
+  loginDemo: () => void
   logout: () => Promise<void>
 }
 
@@ -49,12 +50,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     router.push('/login')
   }, [router])
 
+  const loginDemo = useCallback(() => {
+    // Demo user without API call
+    const demoUser: User = {
+      id: 1,
+      email: 'demo@chapitos.com',
+      name: 'Usuario Demo',
+      role: 'admin',
+    }
+    setStoredUser(demoUser)
+    setUser(demoUser)
+    router.push('/dashboard')
+  }, [router])
+
   return (
     <AuthContext.Provider value={{
       user,
       isLoading,
       isAuthenticated: !!user,
       login,
+      loginDemo,
       logout,
     }}>
       {children}
